@@ -28,21 +28,50 @@ exports.inline_less = {
     done();
   },
   default_options: function(test) {
-    test.expect(1);
+    /**
+     * Function to check if a the given file exists. Using test object.
+     */
+    function fileExist(file) {
+      test.equal(grunt.file.exists(file), true, 'Expected the file "' + file + ' to exist.');
+    }
 
-    var actual = grunt.file.read('tmp/default_options');
-    var expected = grunt.file.read('test/expected/default_options');
-    test.equal(actual, expected, 'should describe what the default behavior is.');
+    // Define variables to hold the output root folder for lessc and inline.
+    var lesscRoot = 'tmp/test/lessc/';
+    var inlineRoot = 'tmp/test/inline/';
+
+    // Get all files created normally by less.
+    var files = grunt.file.expand(lesscRoot + '/*.css');
+
+    // There will be three tests per file.
+    test.expect(files.length*3);
+
+    // Perform the tests for all files.
+    files.map(function(file) {
+      // Get the file name without type extension.
+      var name = file.match(/[^\/]*[.]css$/)[0].replace('.css', '');
+
+      // Will point to the normally created css file using lessc.
+      var lesscFile = lesscRoot + name + '.css';
+
+      // Will point to the created less file by inline task.
+      var inlineFileLESS = inlineRoot + name + '.less';
+
+      // Will point to the created css file using lessc with the inline less file as source.
+      var inlineFileCSS = inlineRoot + '/css/' + name + '.css';
+
+      // There should be a file existing in the inline root, with the exact name except with '.less' ending.
+      fileExist(inlineFileLESS)
+
+      // There should be a compiled version (css) of the inline less file.
+      fileExist(inlineFileCSS)
+
+      // The css version of the inlined less file should be the same as the css file created by less.
+      // (This means that all imports have been followed)
+      test.equal(grunt.file.read(inlineFileCSS), grunt.file.read(lesscFile), 'Expected ' + inlineFileCSS + ' and ' + lesscFile + ' to be equal.');
+    });
 
     test.done();
-  },
-  custom_options: function(test) {
-    test.expect(1);
+  }
 
-    var actual = grunt.file.read('tmp/custom_options');
-    var expected = grunt.file.read('test/expected/custom_options');
-    test.equal(actual, expected, 'should describe what the custom option(s) behavior is.');
-
-    test.done();
-  },
+  //TODO: Test custom options.
 };
