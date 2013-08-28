@@ -60,10 +60,10 @@ exports.inline_less = {
       var inlineFileCSS = inlineRoot + '/css/' + name + '.css';
 
       // There should be a file existing in the inline root, with the exact name except with '.less' ending.
-      fileExist(inlineFileLESS)
+      fileExist(inlineFileLESS);
 
       // There should be a compiled version (css) of the inline less file.
-      fileExist(inlineFileCSS)
+      fileExist(inlineFileCSS);
 
       // The css version of the inlined less file should be the same as the css file created by less.
       // (This means that all imports have been followed)
