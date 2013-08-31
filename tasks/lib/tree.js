@@ -3,11 +3,11 @@
  */
 function Tree(filename, grunt) {
   if(!filename) {
-    throw new Error('Invalid filename');
+    throw new Error('Invalid filename.');
   }
 
   if(!grunt) {
-    throw new Error('Invalid grunt object');
+    throw new Error('Invalid grunt object.');
   }
 
   this.nodes = [];
@@ -16,17 +16,30 @@ function Tree(filename, grunt) {
   this.content = grunt.file.read(filename);
 };
 
+function Node(statement, tree) {
+  if(!statement) {
+    throw new Error('Statement is required.');
+  }
+
+  if(!tree) {
+    throw new Error('A tree is required.');
+  }
+
+  this.statement = statement;
+  this.tree = tree;
+};
+
 /**
- * Reads the content and returns an array with objects that will hold the filename (to be imported) and line number
+ * Reads the content and returns an array with objects that will hold the filename (to be imported) and statement
  * where the statement was found. Returns an empty array if no imports was found.
  */
-Tree.prototype.parseImports = function() {
+Tree.prototype.parseImports = function(content) {
   /**
    * The object that will be created for each import statement.
    */
-  function Import(filename, line) {
+  function Import(filename, statement) {
     this.filename = filename;
-    this.line = line;
+    this.statement = statement;
   }
 
   //The array to return.
@@ -35,18 +48,26 @@ Tree.prototype.parseImports = function() {
   //The import regex to be searched for.
   var importRegex = /@import\s*([(](less|css)[)])?\s*("\S+"|'\S+')([^;])*;/g;
 
-  //The filename regex to match in import lines.
+  //The filename regex to match in import statement.
   var filenameRegex = /("\S*")|('\S*')/;
 
   //Get all import occurances in the content and then process that import.
-  (this.content.match(importRegex) || []).forEach(function(line) {
-    //Get the filename of the import line and make sure to remove the surrounding "" or ''.
-    var filename = filenameRegex.exec(line)[0].replace(/^("|')|("|')$/g, '');
+  (content.match(importRegex) || []).forEach(function(statement) {
+    //Get the filename of the import statement and make sure to remove the surrounding "" or ''.
+    var filename = filenameRegex.exec(statement)[0].replace(/^("|')|("|')$/g, '');
 
-    result.push(new Import(filename));
+    result.push(new Import(filename, statement));
   });
 
   return result;
+};
+
+Tree.prototype.build = function() {
+  //Get all imports from the file content and then loop through each import statement.
+  this.parseImports(this.content).forEach(function(imp) {
+    //Create a new tree from the filename and and add it as a node to this tree.
+    this.nodes.push(new Node(imp.statement, new Tree(imp.filename, this.grunt)));
+  });
 };
 
 /**

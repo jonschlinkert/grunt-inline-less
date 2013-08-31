@@ -18,25 +18,50 @@ exports.tree_test = {
     var filename = 'test/less/test.less';
     var tree = new Tree(filename, grunt);
 
-    var result = tree.parseImports();
+    var result = tree.parseImports(tree.content);
 
     var expected = [
-      'import/urls.less',
-      'import/import-test-e.less',
-      'import/import-test-d.css',
-      'import/import-test-d.css',
-      'import/import-test-c.less',
-      'import/import-test-d.css',
-      'import/urls.less',
-      'import/urls.less',
-      'import/urls.less'
+      {
+        filename: 'import/urls.less',
+        statement: '@import "import/urls.less";'
+      },
+      {
+        filename: 'import/import-test-e.less',
+        statement: '@import \t \t \t"import/import-test-e.less";'
+      },
+      {
+        filename: 'import/import-test-d.css',
+        statement: '@import "import/import-test-d.css";'
+      },
+      {
+        filename: 'import/import-test-d.css',
+        statement: '@import (less) "import/import-test-d.css";'
+      },
+      {
+        filename: 'import/import-test-c.less',
+        statement: '@import "import/import-test-c.less" screen and (max-width: 400px);'
+      },
+      {
+        filename: 'import/import-test-d.css',
+        statement: '@import (less) "import/import-test-d.css" screen and (max-width: 400px);'
+      },
+      {
+        filename: 'import/urls.less',
+        statement: '@import"import/urls.less";'
+      },
+      {
+        filename: 'import/urls.less',
+        statement: '@import (css) "import/urls.less";'
+      },
+      {
+        filename: 'import/urls.less',
+        statement: '@import \'import/urls.less\';'
+      }
     ];
 
     test.equals(result.length, 9, 'Should find all imports in file.');
 
-    test.deepEqual(result.map(function(object) {
-      return object.filename;
-    }), expected, 'Should have parsed all imports.');
+    test.deepEqual(result, expected, 'Should have parsed all imports and with right statements.')
 
     test.done();
   }
