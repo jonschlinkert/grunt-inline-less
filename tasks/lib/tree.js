@@ -1,5 +1,9 @@
 'use strict';
 
+//-----------------------------------------------------------------------------
+// Constructors
+//-----------------------------------------------------------------------------
+
 /**
  * Dependency tree of less files.
  */
@@ -27,6 +31,11 @@ function Tree(filename, grunt, build) {
   }
 }
 
+/**
+ * The node object which the tree object will hold.
+ * Contains the import statement and the dependency tree of
+ * the file.
+ */
 function Node(statement, tree) {
   if(!statement) {
     throw new Error('Statement is required.');
@@ -39,6 +48,10 @@ function Node(statement, tree) {
   this.statement = statement;
   this.tree = tree;
 }
+
+//-----------------------------------------------------------------------------
+// Public functions
+//-----------------------------------------------------------------------------
 
 /**
  * Reads the content and returns an array with objects that will hold the filename (to be imported) and statement
@@ -87,6 +100,31 @@ Tree.prototype.build = function(build) {
   }, this);
 };
 
+Tree.prototype.flatten = function() {
+  var result = [];
+
+  var resultObject = function(statement, content) {
+    this.statement = statement;
+    this.content = content;
+  };
+
+  this.nodes.forEach(function(node) {
+    var nodeResult = node.tree.flatten();
+
+    if(nodeResult.length) {
+      result = result.concat(nodeResult);
+    }
+
+    result.push(new resultObject(node.statement, node.tree.content));
+  }, this);
+
+  return result;
+};
+
+//-----------------------------------------------------------------------------
+// Private functions
+//-----------------------------------------------------------------------------
+
 function getFilename(statement) {
   return statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
 }
@@ -115,7 +153,9 @@ function getType(statement) {
   }
 }
 
-/**
- * Expose the Tree constructor.
- */
+//-----------------------------------------------------------------------------
+// Module exposure
+//-----------------------------------------------------------------------------
+
+//Expose the Tree constructor.
 module.exports = Tree;
