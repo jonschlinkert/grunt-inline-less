@@ -139,5 +139,50 @@ exports.tree_test = {
     test.deepEqual(tree.flatten(), expected, 'Should flatten all dependencies.');
 
     test.done();
+  },
+  removeDuplicates: function(test) {
+    var filename = 'test/less/duplicates.less';
+    var tree = new Tree(filename, grunt);
+
+    var result = tree.removeDuplicates(tree.flatten());
+
+    var expected = [
+      {
+        statement: '@import "import/urls.less";',
+        content: '// empty file showing that it loads from the relative path first\n'
+      },
+      {
+        statement: '@import (less) "import/import-test-d.css";',
+        content: '#css { color: yellow; }\n'
+      },
+      {
+        statement: '@import "import/import-test-e.less" screen and (max-width: 400px);',
+        content: '\nbody { width: 100% }\n'
+      },
+      {
+        statement: '@import "import/import-test-e.less" print;',
+        content: '\nbody { width: 100% }\n'
+      },
+      {
+        statement: '@import "import-test-c.less";',
+        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n'
+      },
+      {
+        statement: '@import "import-test-b.less";',
+        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n'
+      },
+      {
+        statement: '@import \'import/import-test-a.less\';',
+        content: '@import "import-test-b.less";\n@a: 20%;\n@import "urls.less";'
+      },
+      {
+        statement: '@import (css) "import/urls";',
+        content: '// empty file showing that it loads from the relative path first\n'
+      }
+    ];
+
+    test.deepEqual(result, expected, 'Should remove all duplicates.');
+
+    test.done();
   }
 };

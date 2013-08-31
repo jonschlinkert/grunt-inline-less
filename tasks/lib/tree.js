@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash');
+
 //-----------------------------------------------------------------------------
 // Constructors
 //-----------------------------------------------------------------------------
@@ -23,7 +25,7 @@ function Tree(filename, grunt, build) {
   this.nodes = [];
   this.grunt = grunt;
   this.filename = filename;
-  this.dir = this.filename.match(/^.*[\\\/]/)[0];
+  this.dir = getPath(this.filename);
   this.content = grunt.file.read(filename);
 
   if(build) {
@@ -81,11 +83,6 @@ Tree.prototype.parseImports = function(content) {
     //Get the type of the statement (less or css).
     var type = getType(statement);
 
-    if(type === 'less' && /^[^.]+$/.test(filename)) {
-      //Add the less extension to the filename.
-      filename += '.less';
-    }
-
     result.push(new Import(filename, statement, type));
   });
 
@@ -103,7 +100,7 @@ Tree.prototype.build = function(build) {
 Tree.prototype.flatten = function() {
   var result = [];
 
-  var resultObject = function(statement, content) {
+  var ResultObject = function(statement, content) {
     this.statement = statement;
     this.content = content;
   };
@@ -115,8 +112,67 @@ Tree.prototype.flatten = function() {
       result = result.concat(nodeResult);
     }
 
-    result.push(new resultObject(node.statement, node.tree.content));
-  }, this);
+    result.push(new ResultObject(node.statement, node.tree.content));
+  });
+
+  return result;
+};
+
+Tree.prototype.removeDuplicates = function(dependencies) {
+  function priority(dependency, existing) {
+    function isLESS(dep) {
+      return getType(dep.statement) === 'less';
+    }
+
+    function isCSS(dep) {
+      return !isLESS(dep);
+    }
+
+    function hasSelector(dep) {
+      return !!getSelector(dep.statement);
+    }
+
+    if(!hasSelector(dependency) && hasSelector(existing)) {
+      return -1;
+    }
+
+    if(hasSelector(dependency) && !hasSelector(existing)) {
+      return 1;
+    }
+
+    if(hasSelector(dependency) && hasSelector(existing)) {
+      return 0;
+    }
+
+    if(isLESS(dependency) && isCSS(existing)) {
+      return -1;
+    }
+
+    if(isCSS(dependency) && isLESS(existing)) {
+      return 1;
+    }
+
+    return 1;
+  }
+
+  var result = [];
+
+  dependencies.forEach(function(dependency) {
+    var index = _.findIndex(result, function(dep) {
+      return getFilename(dep.statement, false) === getFilename(dependency.statement, false) && dep.content === dependency.content;
+    });
+    debugger;
+    if(!~index) {
+      result.push(dependency);
+    } else {
+      var prio = priority(dependency, result[index]);
+      if(prio < 0) {
+        result[index] = dependency;
+      } else if(prio === 0){
+        result.push(dependency);
+      }
+    }
+  });
 
   return result;
 };
@@ -125,8 +181,18 @@ Tree.prototype.flatten = function() {
 // Private functions
 //-----------------------------------------------------------------------------
 
-function getFilename(statement) {
-  return statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
+function getFilenameRaw(statement, path) {
+  if(path === undefined) {
+    path = true;
+  }
+
+  var result = statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
+
+  if(!path) {
+    result = result.replace(getPath(result), '');
+  }
+
+  return result;
 }
 
 function getType(statement) {
@@ -144,13 +210,33 @@ function getType(statement) {
   }
 
   //No options given. check if the filename has a .css ending.
-  var filename = getFilename(statement);
+  var filename = getFilenameRaw(statement);
 
   if(filename.match(/\.css$/)) {
     return 'css';
   } else {
     return 'less';
   }
+}
+
+function getFilename(statement, path) {
+  var filename = getFilenameRaw(statement, path);
+
+  if(getType(statement) === 'less' && /^[^.]+$/.test(filename)) {
+    //Add the less extension to the filename.
+    filename += '.less';
+  }
+
+  return filename;
+}
+
+function getSelector(statement) {
+  return statement.replace(/@import\s*([(](less|css)[)])?\s*("\S+"|'\S+')\s*/, '').replace(/;$/, '');
+}
+
+function getPath(filename) {
+  var path = filename.match(/^.*[\\\/]/)
+  return path && path[0] || '';
 }
 
 //-----------------------------------------------------------------------------
