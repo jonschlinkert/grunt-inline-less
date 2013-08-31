@@ -13,6 +13,7 @@ function Tree(filename, grunt) {
   this.nodes = [];
   this.grunt = grunt;
   this.filename = filename;
+  this.dir = this.filename.match(/^.*[\\\/]/)[0];
   this.content = grunt.file.read(filename);
 };
 
@@ -66,8 +67,8 @@ Tree.prototype.build = function() {
   //Get all imports from the file content and then loop through each import statement.
   this.parseImports(this.content).forEach(function(imp) {
     //Create a new tree from the filename and and add it as a node to this tree.
-    this.nodes.push(new Node(imp.statement, new Tree(imp.filename, this.grunt)));
-  });
+    this.nodes.push(new Node(imp.statement, new Tree(this.dir + imp.filename, this.grunt)));
+  }, this);
 };
 
 /**

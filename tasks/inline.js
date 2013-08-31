@@ -15,7 +15,6 @@ module.exports = function(grunt) {
   var _ = require('lodash');
 
   grunt.registerMultiTask('inline', 'Inline less files.', function() {
-
     var options = this.options({
       separator: '\n\n',
       paths: [],
