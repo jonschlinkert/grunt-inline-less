@@ -114,8 +114,9 @@ Tree.prototype.flatten = function() {
   /**
    * The result object constructor that will be created for every dependency.
    */
-  var ResultObject = function(statement, content) {
+  var ResultObject = function(statement, filename, content) {
     this.statement = statement;
+    this.filename = filename;
     this.content = content;
   };
 
@@ -130,7 +131,7 @@ Tree.prototype.flatten = function() {
     }
 
     //Now add the current nodes file (as specified in the tree) as a dependency.
-    result.push(new ResultObject(node.statement, node.tree.content));
+    result.push(new ResultObject(node.statement, node.tree.filename, node.tree.content));
   });
 
   return result;
@@ -195,20 +196,27 @@ Tree.prototype.removeDuplicates = function(dependencies) {
   dependencies.forEach(function(dependency) {
     //Get the index of the current dependency to see if it already exists in the result array.
     var index = _.findIndex(result, function(dep) {
-      return getFilename(dep.statement, false) === getFilename(dependency.statement, false) && dep.content === dependency.content;
-    });
+      //The dependencies are the same if the paths are equivalent and the content equal.
+      return this.grunt.file.arePathsEquivalent(dep.filename, dependency.filename) && dep.content === dependency.content;
+    }, this);
 
     if(!~index) {
+      //The dependency was not found, so add it to the result array.
       result.push(dependency);
     } else {
-      var prio = priority(dependency, result[index]);
+      //The dependency was found, so check the prio status.
+      var prio = priority.call(this, dependency, result[index]);
       if(prio < 0) {
+        //The current dependecy have higher prio than the existing one, so replace it.
         result[index] = dependency;
       } else if(prio === 0){
+        //Both have the same prio, so add the current one.
         result.push(dependency);
       }
+
+      //The existing have higher prio, so do nothing.
     }
-  });
+  }, this);
 
   return result;
 };
@@ -217,18 +225,8 @@ Tree.prototype.removeDuplicates = function(dependencies) {
 // Private functions
 //-----------------------------------------------------------------------------
 
-function getFilenameRaw(statement, path) {
-  if(path === undefined) {
-    path = true;
-  }
-
-  var result = statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
-
-  if(!path) {
-    result = result.replace(getPath(result), '');
-  }
-
-  return result;
+function getFilenameRaw(statement) {
+  return statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
 }
 
 function getType(statement) {
@@ -255,8 +253,8 @@ function getType(statement) {
   }
 }
 
-function getFilename(statement, path) {
-  var filename = getFilenameRaw(statement, path);
+function getFilename(statement) {
+  var filename = getFilenameRaw(statement);
 
   if(getType(statement) === 'less' && /^[^.]+$/.test(filename)) {
     //Add the less extension to the filename.
