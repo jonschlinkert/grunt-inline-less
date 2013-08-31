@@ -92,6 +92,7 @@ module.exports = function(grunt) {
     // Unit tests.
     nodeunit: {
       tests: ['test/*_test.js'],
+      tree: 'test/tree_test.js'
     }
 
   });
