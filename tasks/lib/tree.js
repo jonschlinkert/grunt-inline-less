@@ -48,9 +48,10 @@ Tree.prototype.parseImports = function(content) {
   /**
    * The object that will be created for each import statement.
    */
-  function Import(filename, statement) {
+  function Import(filename, statement, type) {
     this.filename = filename;
     this.statement = statement;
+    this.type = type;
   }
 
   //The array to return.
@@ -59,15 +60,20 @@ Tree.prototype.parseImports = function(content) {
   //The import regex to be searched for.
   var importRegex = /@import\s*([(](less|css)[)])?\s*("\S+"|'\S+')([^;])*;/g;
 
-  //The filename regex to match in import statement.
-  var filenameRegex = /("\S*")|('\S*')/;
-
   //Get all import occurances in the content and then process that import.
   (content.match(importRegex) || []).forEach(function(statement) {
     //Get the filename of the import statement and make sure to remove the surrounding "" or ''.
-    var filename = filenameRegex.exec(statement)[0].replace(/^("|')|("|')$/g, '');
+    var filename = getFilename(statement);
 
-    result.push(new Import(filename, statement));
+    //Get the type of the statement (less or css).
+    var type = getType(statement);
+
+    if(type === 'less' && /^[^.]+$/.test(filename)) {
+      //Add the less extension to the filename.
+      filename += '.less';
+    }
+
+    result.push(new Import(filename, statement, type));
   });
 
   return result;
@@ -80,6 +86,34 @@ Tree.prototype.build = function(build) {
     this.nodes.push(new Node(imp.statement, new Tree(this.dir + imp.filename, this.grunt, build)));
   }, this);
 };
+
+function getFilename(statement) {
+  return statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
+}
+
+function getType(statement) {
+  if(!statement) {
+    throw new Error('Requires a statement.');
+  }
+
+  var optionLESS = /@import\s*[(]less[)]/;
+  var optionCSS = /@import\s*[(]css[)]/;
+
+  if(optionLESS.test(statement)) {
+    return 'less';
+  } else if(optionCSS.test(statement)) {
+    return 'css';
+  }
+
+  //No options given. check if the filename has a .css ending.
+  var filename = getFilename(statement);
+
+  if(filename.match(/\.css$/)) {
+    return 'css';
+  } else {
+    return 'less';
+  }
+}
 
 /**
  * Expose the Tree constructor.
