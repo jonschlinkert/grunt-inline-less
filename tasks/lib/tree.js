@@ -3,7 +3,7 @@
 /**
  * Dependency tree of less files.
  */
-function Tree(filename, grunt) {
+function Tree(filename, grunt, build) {
   if(!filename) {
     throw new Error('Invalid filename.');
   }
@@ -12,11 +12,19 @@ function Tree(filename, grunt) {
     throw new Error('Invalid grunt object.');
   }
 
+  if(build === undefined) {
+    build = true;
+  }
+
   this.nodes = [];
   this.grunt = grunt;
   this.filename = filename;
   this.dir = this.filename.match(/^.*[\\\/]/)[0];
   this.content = grunt.file.read(filename);
+
+  if(build) {
+    this.build(build);
+  }
 }
 
 function Node(statement, tree) {
@@ -65,11 +73,11 @@ Tree.prototype.parseImports = function(content) {
   return result;
 };
 
-Tree.prototype.build = function() {
+Tree.prototype.build = function(build) {
   //Get all imports from the file content and then loop through each import statement.
   this.parseImports(this.content).forEach(function(imp) {
     //Create a new tree from the filename and and add it as a node to this tree.
-    this.nodes.push(new Node(imp.statement, new Tree(this.dir + imp.filename, this.grunt)));
+    this.nodes.push(new Node(imp.statement, new Tree(this.dir + imp.filename, this.grunt, build)));
   }, this);
 };
 

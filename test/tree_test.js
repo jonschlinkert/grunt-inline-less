@@ -17,7 +17,7 @@ exports.tree_test = {
   },
   parseImports: function(test) {
     var filename = 'test/less/test.less';
-    var tree = new Tree(filename, grunt);
+    var tree = new Tree(filename, grunt, false);
 
     var result = tree.parseImports(tree.content);
 
@@ -69,8 +69,6 @@ exports.tree_test = {
   build: function(test) {
     var filename = 'test/less/test.less';
     var tree = new Tree(filename, grunt);
-
-    tree.build();
 
     test.equal(tree.nodes.length, 9, 'Should have created nodes for all imports.');
 
