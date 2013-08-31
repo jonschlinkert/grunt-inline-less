@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Dependency tree of less files.
  */
@@ -15,7 +17,7 @@ function Tree(filename, grunt) {
   this.filename = filename;
   this.dir = this.filename.match(/^.*[\\\/]/)[0];
   this.content = grunt.file.read(filename);
-};
+}
 
 function Node(statement, tree) {
   if(!statement) {
@@ -28,7 +30,7 @@ function Node(statement, tree) {
 
   this.statement = statement;
   this.tree = tree;
-};
+}
 
 /**
  * Reads the content and returns an array with objects that will hold the filename (to be imported) and statement

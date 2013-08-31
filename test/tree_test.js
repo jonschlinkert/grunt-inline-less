@@ -62,7 +62,7 @@ exports.tree_test = {
 
     test.equals(result.length, 9, 'Should find all imports in file.');
 
-    test.deepEqual(result, expected, 'Should have parsed all imports and with right statements.')
+    test.deepEqual(result, expected, 'Should have parsed all imports and with right statements.');
 
     test.done();
   },
