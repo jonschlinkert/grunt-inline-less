@@ -1,7 +1,14 @@
 'use strict';
 
-var path = require('path');
-var _ = require('lodash');
+var path = require('path');   //Required for path and file extension handling.
+var _ = require('lodash');    //Required for extended array manipulation.
+
+//-----------------------------------------------------------------------------
+// Module exposure
+//-----------------------------------------------------------------------------
+
+//Expose the Tree constructor.
+module.exports = Tree;
 
 //-----------------------------------------------------------------------------
 // Constructors
@@ -9,10 +16,12 @@ var _ = require('lodash');
 
 /**
  * Dependency tree of less files.
+ * First argument source can either be a filename or a string containing content.
+ * If source is only content, both source and dir will be equal to ''.
  */
-function Tree(filename, grunt, build) {
-  if(!filename) {
-    throw new Error('Invalid filename.');
+function Tree(source, grunt, build) {
+  if(!source) {
+    throw new Error('Invalid source.');
   }
 
   if(!grunt) {
@@ -26,9 +35,9 @@ function Tree(filename, grunt, build) {
 
   this.nodes = [];
   this.grunt = grunt;
-  this.filename = grunt.file.isFile(filename) && filename || '';
-  this.dir = grunt.file.isFile(filename) && getPath(filename) || '';
-  this.content = grunt.file.isFile(filename) && grunt.file.read(filename) || filename;
+  this.filename = grunt.file.isFile(source) && source || '';
+  this.dir = grunt.file.isFile(source) && getPath(source) || '';
+  this.content = grunt.file.isFile(source) && grunt.file.read(source) || source;
 
   if(build) {
     //The build options is set to true, so build the tree and pass in
@@ -207,7 +216,7 @@ Tree.prototype.removeDuplicates = function(dependencies) {
       result.push(dependency);
     } else {
       //The dependency was found, so check the prio status.
-      var prio = priority.call(this, dependency, result[index]);
+      var prio = priority(dependency, result[index]);
       if(prio < 0) {
         //The current dependecy have higher prio than the existing one, so replace it.
         result[index] = dependency;
@@ -227,17 +236,26 @@ Tree.prototype.removeDuplicates = function(dependencies) {
 // Private functions
 //-----------------------------------------------------------------------------
 
+/**
+ * Gets the filename of the import statement.
+ */
 function getFilenameRaw(statement) {
   return statement.match(/("\S*")|('\S*')/)[0].replace(/^("|')|("|')$/g, '');
 }
 
+/**
+ * Gets the type of the import. Import option have higher priority than file extension.
+ * If to option found, anything except .css is considered to be less.
+ */
 function getType(statement) {
   var optionLESS = /@import\s*[(]less[)]/;
   var optionCSS = /@import\s*[(]css[)]/;
 
   if(optionLESS.test(statement)) {
+    //The statement has a less option set.
     return 'less';
   } else if(optionCSS.test(statement)) {
+    //The statement has a css option set.
     return 'css';
   }
 
@@ -245,15 +263,23 @@ function getType(statement) {
   var filename = getFilenameRaw(statement);
 
   if(path.extname(filename) === '.css') {
+    //The filename has .css file extension.
     return 'css';
   } else {
+    //Any extension except for .css are considered to be less.
     return 'less';
   }
 }
 
+/**
+ * Gets the computed filename. If the raw filename doesnt have any file extension
+ * a .less file extension will be added to the filename.
+ */
 function getFilename(statement) {
+  //Get the raw filename.
   var filename = getFilenameRaw(statement);
 
+  //Check if the type of the import is less and if no file extension is present.
   if(getType(statement) === 'less' && !path.extname(filename)) {
     //Add the less extension to the filename.
     filename += '.less';
@@ -262,17 +288,16 @@ function getFilename(statement) {
   return filename;
 }
 
+/**
+ * Gets any css selector after filename is import statement.
+ */
 function getSelector(statement) {
   return statement.replace(/@import\s*([(](less|css)[)])?\s*("\S+"|'\S+')\s*/, '').replace(/;$/, '');
 }
 
+/**
+ * Gets the path of the filename with a trailing /.
+ */
 function getPath(filename) {
   return path.normalize(path.dirname(filename) + '/');
 }
-
-//-----------------------------------------------------------------------------
-// Module exposure
-//-----------------------------------------------------------------------------
-
-//Expose the Tree constructor.
-module.exports = Tree;
