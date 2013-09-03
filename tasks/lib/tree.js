@@ -1,5 +1,6 @@
 'use strict';
 
+var path = require('path');
 var _ = require('lodash');
 
 //-----------------------------------------------------------------------------
@@ -231,10 +232,6 @@ function getFilenameRaw(statement) {
 }
 
 function getType(statement) {
-  if(!statement) {
-    throw new Error('Requires a statement.');
-  }
-
   var optionLESS = /@import\s*[(]less[)]/;
   var optionCSS = /@import\s*[(]css[)]/;
 
@@ -247,7 +244,7 @@ function getType(statement) {
   //No options given. check if the filename has a .css ending.
   var filename = getFilenameRaw(statement);
 
-  if(filename.match(/\.css$/)) {
+  if(path.extname(filename) === '.css') {
     return 'css';
   } else {
     return 'less';
@@ -257,7 +254,7 @@ function getType(statement) {
 function getFilename(statement) {
   var filename = getFilenameRaw(statement);
 
-  if(getType(statement) === 'less' && /^[^.]+$/.test(filename)) {
+  if(getType(statement) === 'less' && !path.extname(filename)) {
     //Add the less extension to the filename.
     filename += '.less';
   }
@@ -270,8 +267,7 @@ function getSelector(statement) {
 }
 
 function getPath(filename) {
-  var path = filename.match(/^.*[\\\/]/)
-  return path && path[0] || '';
+  return path.normalize(path.dirname(filename) + '/');
 }
 
 //-----------------------------------------------------------------------------
