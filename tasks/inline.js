@@ -13,47 +13,63 @@ module.exports = function(grunt) {
   var path = require('path');
   var chalk = require('chalk');
   var _ = require('lodash');
+  var Tree = require('./lib/tree.js');
 
   grunt.registerMultiTask('inline', 'Inline less files.', function() {
     var options = this.options({
       separator: '\n\n',
       paths: [],
-      concat: true,
+      concat: true
     });
-
-    var parseManifest = function(filename) {
-      var manifestFile = grunt.file.read(filename);
-      var importRegex = /@import "([\w\.\-]+)";/;
-      var start = 0;
-      var match;
-      var manifest = [];
-      while (match = importRegex.exec(manifestFile.substring(start))) {
-        manifest.push(match[1]);
-        start += match['index'] + 1;
-      }
-      return manifest;
-    };
 
     // Iterate over all src-dest file pairs.
     this.files.forEach(function(f) {
-      var src = grunt.file.expand(f.src).map(function(path) {
-        return {
-          path: path,
-          imports: parseManifest(path)
-        };
-      }).map(function(obj) {
 
-        grunt.verbose.writeln("Import statements: " + chalk.cyan(obj.imports));
+      var base = grunt.file.expand(f.src).map(function(src) {
+        return '@import (less) "' + src + '";';
+      }).join(options.separator);
 
-        var content = _(obj.imports).map(function(filepath) {
-          filepath = options.paths + '/' + filepath;
-          return grunt.file.read(filepath);
-        }).join(grunt.util.normalizelf(grunt.util.linefeed));
+      if(!base) {
+        grunt.log.warn('Failed to read file(s): ' + f.orig.src.join(' '));
+        return;
+      }
+      
+      grunt.verbose.writeln(chalk.cyan('Building dependency tree for source files:\n' + base));
 
-        grunt.file.write(f.dest, content);
+      //Create a new tree for each src file.
+      // grunt.verbose.writeln(chalk.cyan('Building dependency tree for ' + f.src));
+      var tree = new Tree(base, grunt);
 
-      }).join(grunt.util.normalizelf(grunt.util.linefeed));
+      //Flatten the dependency tree.
+      var dependencies = tree.flatten();
+
+      //Remove the duplicates.
+      var uniqueDependencies = tree.removeDuplicates(dependencies);
+
+      //Create a variable that will hold the content to be written to dest file.
+      var result = tree.content;
+
+      grunt.verbose.writeln(chalk.cyan('Inlining content'));
+
+      //Loop all unique dependencies.
+      uniqueDependencies.reverse().forEach(function(dependency) {
+        if(dependency.type === 'less') {
+          //Inline the content for the dependency into where the statement was found (the first occurance).
+          result = result.replace(dependency.statement, dependency.content);
+        }
+      });
+
+      //Loop all dependencies and remove the statements from the content.
+      dependencies.forEach(function(dependency) {
+        if(dependency.type === 'less') {
+          result = result.replace(dependency.statement, '');
+        }
+      });
+
+      //Write the result to the dest file.
+      grunt.verbose.writeln(chalk.cyan('Writing to dest file ' + f.dest));
+      grunt.file.write(f.dest, result);
+      grunt.log.writeln('File ' + chalk.cyan(f.dest) + ' created.');
     });
   });
-
 };

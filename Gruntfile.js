@@ -17,16 +17,16 @@ module.exports = function(grunt) {
       all: [
         'Gruntfile.js',
         'tasks/*.js',
-        '<%= nodeunit.tests %>',
+        '<%= nodeunit.tests %>'
       ],
       options: {
-        jshintrc: '.jshintrc',
-      },
+        jshintrc: '.jshintrc'
+      }
     },
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['tmp'],
+      tests: ['tmp']
     },
 
     // Configuration to be run (and then tested).
@@ -42,11 +42,10 @@ module.exports = function(grunt) {
           'tmp/test/inline/import-test-c.less': ['test/less/import/import-test-c.less'],
           'tmp/test/inline/import-test-b.less': ['test/less/import/import-test-b.less'],
           'tmp/test/inline/import-test-a.less': ['test/less/import/import-test-a.less'],
-          'tmp/test/inline/css/import-once-test-c.css': ['tmp/test/inline/import-once-test-c.less'],
-          'tmp/test/inline/css/import-interpolation-tester.css': ['tmp/test/inline/import-interpolation-tester.less'],
-          'tmp/test/inline/css/import-charset-test.css': ['tmp/test/inline/import-charset-test.less'],
-          'tmp/test/inline/css/import-and-relative-paths-test.css': ['tmp/test/inline/import-and-relative-paths-test.less']
-
+          'tmp/test/inline/import-once-test-c.less': ['test/less/import/import-once-test-c.less'],
+          // 'tmp/test/inline/import-interpolation-tester.less': ['test/less/import/import-interpolation-tester.less'],
+          'tmp/test/inline/import-charset-test.less': ['test/less/import/import-charset-test.less'],
+          'tmp/test/inline/import-and-relative-paths-test.less': ['test/less/import/import-and-relative-paths-test.less']
         }
       }
     },
@@ -65,7 +64,7 @@ module.exports = function(grunt) {
           'tmp/test/lessc/import-test-b.css': ['test/less/import/import-test-b.less'],
           'tmp/test/lessc/import-test-a.css': ['test/less/import/import-test-a.less'],
           'tmp/test/lessc/import-once-test-c.css': ['test/less/import/import-once-test-c.less'],
-          'tmp/test/lessc/import-interpolation2.css': ['test/less/import/import-interpolation2.less'],
+          // 'tmp/test/lessc/import-interpolation2.css': ['test/less/import/import-interpolation2.less'],
           'tmp/test/lessc/import-charset-test.css': ['test/less/import/import-charset-test.less'],
           'tmp/test/lessc/import-and-relative-paths-test.css': ['test/less/import/import-and-relative-paths-test.less']
         } 
@@ -82,7 +81,7 @@ module.exports = function(grunt) {
           'tmp/test/inline/css/import-test-b.css': ['tmp/test/inline/import-test-b.less'],
           'tmp/test/inline/css/import-test-a.css': ['tmp/test/inline/import-test-a.less'],
           'tmp/test/inline/css/import-once-test-c.css': ['tmp/test/inline/import-once-test-c.less'],
-          'tmp/test/inline/css/import-interpolation-tester.css': ['tmp/test/inline/import-interpolation-tester.less'],
+          // 'tmp/test/inline/css/import-interpolation-tester.css': ['tmp/test/inline/import-interpolation-tester.less'],
           'tmp/test/inline/css/import-charset-test.css': ['tmp/test/inline/import-charset-test.less'],
           'tmp/test/inline/css/import-and-relative-paths-test.css': ['tmp/test/inline/import-and-relative-paths-test.less']
         }
@@ -91,8 +90,7 @@ module.exports = function(grunt) {
 
     // Unit tests.
     nodeunit: {
-      tests: ['test/*_test.js'],
-      tree: 'test/tree_test.js'
+      tests: ['test/*_test.js']
     }
 
   });

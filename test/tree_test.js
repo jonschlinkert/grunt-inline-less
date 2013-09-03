@@ -101,47 +101,56 @@ exports.tree_test = {
       {
         statement: '@import "../css/background.css";',
         filename: 'test/less/import/../css/background.css',
-        content: 'body {\n  background-color: red;\n}\n'
+        content: 'body {\n  background-color: red;\n}\n',
+        type: 'css'
       },
       {
         statement: '@import "import-test-d.css";',
         filename: 'test/less/import/import-test-d.css',
-        content: '#css { color: yellow; }\n'
+        content: '#css { color: yellow; }\n',
+        type: 'css'
       },
       {
         statement: '@import "imports/logo";',
         filename: 'test/less/import/imports/logo.less',
-        content: '#logo {\n  width: 100px;\n  height: 100px;\n  background: url(\'../assets/logo.png\');\n}\n'
+        content: '#logo {\n  width: 100px;\n  height: 100px;\n  background: url(\'../assets/logo.png\');\n}\n',
+        type: 'less'
       },
       {
         statement: '@import "imports/font";',
         filename: 'test/less/import/imports/font.less',
-        content: '@font-face {\n\tfont-family: xecret;\n\tsrc: url(\'../assets/xecret.ttf\');\n}\n\n#secret {\n\tfont-family: xecret, sans-serif;\n}\n'
+        content: '@font-face {\n\tfont-family: xecret;\n\tsrc: url(\'../assets/xecret.ttf\');\n}\n\n#secret {\n\tfont-family: xecret, sans-serif;\n}\n',
+        type: 'less'
       },
       {
         statement: '@import "import/import-and-relative-paths-test.less";',
         filename: 'test/less/import/import-and-relative-paths-test.less',
-        content: '@import "../css/background.css";\n@import "import-test-d.css";\n\n@import "imports/logo";\n@import "imports/font";\n\n'
+        content: '@import "../css/background.css";\n@import "import-test-d.css";\n\n@import "imports/logo";\n@import "imports/font";\n\n',
+        type: 'less'
       },
       {
         statement: '@import "import-test-c.less";',
         filename: 'test/less/import/import-test-c.less',
-        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n'
+        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n',
+        type: 'less'
       },
       {
         statement: '@import "import-test-b.less";',
         filename: 'test/less/import/import-test-b.less',
-        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n'
+        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
+        type: 'less'
       },
       {
         statement: '@import "urls.less";',
         filename: 'test/less/import/urls.less',
-        content: '// empty file showing that it loads from the relative path first\n'
+        content: '// empty file showing that it loads from the relative path first\n',
+        type: 'less'
       },
       {
         statement: '@import "import/import-test-a.less";',
         filename: 'test/less/import/import-test-a.less',
-        content: '@import "import-test-b.less";\n@a: 20%;\n@import "urls.less";'
+        content: '@import "import-test-b.less";\n@a: 20%;\n@import "urls.less";',
+        type: 'less'
       }
     ];
 
@@ -159,42 +168,50 @@ exports.tree_test = {
       {
         statement: '@import "import/urls.less";',
         filename: 'test/less/import/urls.less',
-        content: '// empty file showing that it loads from the relative path first\n'
+        content: '// empty file showing that it loads from the relative path first\n',
+        type: 'less'
       },
       {
         statement: '@import (less) "import/import-test-d.css";',
         filename: 'test/less/import/import-test-d.css',
-        content: '#css { color: yellow; }\n'
+        content: '#css { color: yellow; }\n',
+        type: 'less'
       },
       {
         statement: '@import "import/import-test-e.less" screen and (max-width: 400px);',
         filename: 'test/less/import/import-test-e.less',
-        content: '\nbody { width: 100% }\n'
+        content: '\nbody { width: 100% }\n',
+        type: 'less'
       },
       {
         statement: '@import "import/import-test-e.less" print;',
         filename: 'test/less/import/import-test-e.less',
-        content: '\nbody { width: 100% }\n'
+        content: '\nbody { width: 100% }\n',
+        type: 'less'
       },
       {
         statement: '@import "import-test-c.less";',
         filename: 'test/less/import/import-test-c.less',
-        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n'
+        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n',
+        type: 'less'
       },
       {
         statement: '@import "import-test-b.less";',
         filename: 'test/less/import/import-test-b.less',
-        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n'
+        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
+        type: 'less'
       },
       {
         statement: '@import \'import/import-test-a.less\';',
         filename: 'test/less/import/import-test-a.less',
-        content: '@import "import-test-b.less";\n@a: 20%;\n@import "urls.less";'
+        content: '@import "import-test-b.less";\n@a: 20%;\n@import "urls.less";',
+        type: 'less'
       },
       {
         statement: '@import (css) "import/urls";',
         filename: 'test/less/import/urls',
-        content: '// empty file showing that it loads from the relative path first\n'
+        content: '// empty file showing that it loads from the relative path first\n',
+        type: 'css'
       }
     ];
 

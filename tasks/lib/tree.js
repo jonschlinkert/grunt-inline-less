@@ -25,9 +25,9 @@ function Tree(filename, grunt, build) {
 
   this.nodes = [];
   this.grunt = grunt;
-  this.filename = filename;
-  this.dir = getPath(filename);
-  this.content = grunt.file.read(filename);
+  this.filename = grunt.file.isFile(filename) && filename || '';
+  this.dir = grunt.file.isFile(filename) && getPath(filename) || '';
+  this.content = grunt.file.isFile(filename) && grunt.file.read(filename) || filename;
 
   if(build) {
     //The build options is set to true, so build the tree and pass in
@@ -118,6 +118,7 @@ Tree.prototype.flatten = function() {
     this.statement = statement;
     this.filename = filename;
     this.content = content;
+    this.type = getType(statement);
   };
 
   //Loop through each node in the tree.
