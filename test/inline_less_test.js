@@ -42,9 +42,6 @@ exports.inline_less = {
     // Get all files created normally by less.
     var files = grunt.file.expand(lesscRoot + '/*.css');
 
-    // There will be three tests per file.
-    test.expect(files.length*3);
-
     // Perform the tests for all files.
     files.map(function(file) {
       // Get the file name without type extension.
@@ -57,13 +54,13 @@ exports.inline_less = {
       var inlineFileLESS = inlineRoot + name + '.less';
 
       // Will point to the created css file using lessc with the inline less file as source.
-      var inlineFileCSS = inlineRoot + '/css/' + name + '.css';
+      var inlineFileCSS = inlineRoot + 'css/' + name + '.css';
 
       // There should be a file existing in the inline root, with the exact name except with '.less' ending.
-      fileExist(inlineFileLESS)
+      fileExist(inlineFileLESS);
 
       // There should be a compiled version (css) of the inline less file.
-      fileExist(inlineFileCSS)
+      fileExist(inlineFileCSS);
 
       // The css version of the inlined less file should be the same as the css file created by less.
       // (This means that all imports have been followed)
