@@ -2,7 +2,7 @@
  * grunt-inline-less
  * https://github.com/jonschlinkert/grunt-inline-less
  *
- * Copyright (c) 2013 Jon Schlinkert
+ * Copyright (c) 2013 Jon Schlinkert, contributors
  * Licensed under the MIT license.
  */
 
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
       }
     },
 
-    // Before generating any new files, remove any previously-created files.
+    // Before generating any new files, remove files from previous build.
     clean: {
       tests: ['tmp']
     },
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
           // 'tmp/test/lessc/import-interpolation2.css': ['test/less/import/import-interpolation2.less'],
           'tmp/test/lessc/import-charset-test.css': ['test/less/import/import-charset-test.less'],
           'tmp/test/lessc/import-and-relative-paths-test.css': ['test/less/import/import-and-relative-paths-test.less']
-        } 
+        }
       },
       inline: {
         options: {
@@ -106,8 +106,8 @@ module.exports = function(grunt) {
   // For testing.
   grunt.loadNpmTasks('grunt-contrib-less');
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
+  // Whenever the "test" task is run, first clean the "tmp" dir,
+  // then run this plugin's task(s), then test the result.
   grunt.registerTask('test', ['clean', 'inline:test', 'less', 'nodeunit']);
 
   // By default, lint and run all tests.
