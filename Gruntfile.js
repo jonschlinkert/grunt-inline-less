@@ -1,6 +1,6 @@
 /*
  * grunt-inline-less
- * https://github.com/jps/grunt-inline-less
+ * https://github.com/jonschlinkert/grunt-inline-less
  *
  * Copyright (c) 2013 Jon Schlinkert
  * Licensed under the MIT license.
