@@ -28,6 +28,7 @@ exports.inline_less = {
     done();
   },
   default_options: function(test) {
+
     /**
      * Function to check if a the given file exists. Using test object.
      */
@@ -36,8 +37,8 @@ exports.inline_less = {
     }
 
     // Define variables to hold the output root folder for lessc and inline.
-    var lesscRoot = 'tmp/test/lessc/';
-    var inlineRoot = 'tmp/test/inline/';
+    var lesscRoot = 'test/actual/lessc/';
+    var inlineRoot = 'test/actual/inline/';
 
     // Get all files created normally by less.
     var files = grunt.file.expand(lesscRoot + '/*.css');

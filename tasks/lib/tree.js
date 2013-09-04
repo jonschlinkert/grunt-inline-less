@@ -48,9 +48,9 @@ function Tree(source, grunt, build) {
 
   this.nodes = [];
   this.grunt = grunt;
-  this.filename = grunt.file.isFile(source) && source || '';
-  this.dir = grunt.file.isFile(source) && getPath(source) || '';
-  this.content = grunt.file.isFile(source) && grunt.file.read(source) || source;
+  this.filename = (grunt.file.isFile(source) && source || '');
+  this.dir = (grunt.file.isFile(source) && getPath(source) || '').replace(/\\/g, '/');
+  this.content = (grunt.file.isFile(source) && grunt.file.read(source) || source).replace(/(\n|\r){2,}/g, '\n');
 
   if(build) {
 

@@ -1,3 +1,11 @@
+/*
+ * grunt-inline-less
+ * https://github.com/jonschlinkert/grunt-inline-less
+ *
+ * Copyright (c) 2013 Jon Schlinkert, contributors
+ * Licensed under the MIT license.
+ */
+
 'use strict';
 
 var Tree = require('../tasks/lib/tree.js');
@@ -119,25 +127,25 @@ exports.tree_test = {
       {
         statement: '@import "imports/font";',
         filename: 'test/less/import/imports/font.less',
-        content: '@font-face {\n\tfont-family: xecret;\n\tsrc: url(\'../assets/xecret.ttf\');\n}\n\n#secret {\n\tfont-family: xecret, sans-serif;\n}\n',
+        content: '@font-face {\n\tfont-family: xecret;\n\tsrc: url(\'../assets/xecret.ttf\');\n}\n#secret {\n\tfont-family: xecret, sans-serif;\n}\n',
         type: 'less'
       },
       {
         statement: '@import "import/import-and-relative-paths-test.less";',
         filename: 'test/less/import/import-and-relative-paths-test.less',
-        content: '@import "../css/background.css";\n@import "import-test-d.css";\n\n@import "imports/logo";\n@import "imports/font";\n\n',
+        content: '@import "../css/background.css";\n@import "import-test-d.css";\n@import "imports/logo";\n@import "imports/font";\n',
         type: 'less'
       },
       {
         statement: '@import "import-test-c.less";',
         filename: 'test/less/import/import-test-c.less',
-        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n',
+        content: '\n@c: red;\n#import {\n  color: @c;\n}\n',
         type: 'less'
       },
       {
         statement: '@import "import-test-b.less";',
         filename: 'test/less/import/import-test-b.less',
-        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
+        content: '@import "import-test-c.less";\n@b: 100%;\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
         type: 'less'
       },
       {
@@ -192,13 +200,13 @@ exports.tree_test = {
       {
         statement: '@import "import-test-c.less";',
         filename: 'test/less/import/import-test-c.less',
-        content: '\n@c: red;\n\n#import {\n  color: @c;\n}\n',
+        content: '\n@c: red;\n#import {\n  color: @c;\n}\n',
         type: 'less'
       },
       {
         statement: '@import "import-test-b.less";',
         filename: 'test/less/import/import-test-b.less',
-        content: '@import "import-test-c.less";\n\n@b: 100%;\n\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
+        content: '@import "import-test-c.less";\n@b: 100%;\n.mixin {\n  height: 10px;\n  color: @c;\n}\n',
         type: 'less'
       },
       {
